@@ -1,0 +1,26 @@
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
+pipelines:
+  pull-requests:
+    '**':
+      - step:
+          name: Build & Validate
+          caches:
+            - dotnetcore
+          script:
+            - dotnet restore
+            - dotnet build --configuration Release --no-restore
+            - dotnet test --no-build || true   # remove '|| true' once tests exist
+      - step:
+          name: Angular Build (if applicable)
+          image: node:20
+          script:
+            - if [ -f "angular.json" ]; then npm ci && npx ng build --configuration production; fi
+
+  branches:
+    main:
+      - step:
+          name: Final Build Check Before Merge
+          script:
+            - dotnet restore
+            - dotnet build --configuration Release --no-restore

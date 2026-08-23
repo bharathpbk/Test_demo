@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+MSG_FILE=$1
+PATTERN="^(feat|fix|chore|refactor|docs|test|build|ci)(\([a-zA-Z0-9_-]+\))?: .{1,100}$"
+FIRST_LINE=$(head -n1 "$MSG_FILE")
+
+if ! [[ "$FIRST_LINE" =~ $PATTERN ]]; then
+  echo "Commit message rejected."
+  echo "Required format: <type>(optional-scope): short description"
+  echo "Allowed types: feat, fix, chore, refactor, docs, test, build, ci"
+  echo "Example: feat(login): add token refresh logic"
+  exit 1
+fi
