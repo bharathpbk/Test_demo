@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+# Accepts either: feature/bugfix/hotfix/release prefixed branches,
+# OR a plain developer-name branch (e.g. bharath, viswa)
+PATTERN="^(feature|bugfix|hotfix|release)/[a-z0-9._-]+$|^[a-z][a-z0-9_-]{1,30}$"
+
+if [[ "$BRANCH" == "master" || "$BRANCH" == "main" ]]; then
+  echo "Direct push to $BRANCH is not allowed. Use a PR."
+  exit 1
+fi
+
+if ! [[ "$BRANCH" =~ $PATTERN ]]; then
+  echo "Branch name '$BRANCH' does not follow convention."
+  echo "Use: feature/<name>, bugfix/<name>, hotfix/<name>, release/<name>, or your-name"
+  exit 1
+fi

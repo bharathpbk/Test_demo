@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -e
+echo "Running pre-commit build check..."
+
+if ls ./*.sln >/dev/null 2>&1 || find . -maxdepth 3 -name "*.csproj" | grep -q .; then
+  echo "-> .NET project detected, running dotnet build..."
+  dotnet build --nologo -v quiet
+  if [ $? -ne 0 ]; then
+    echo "BUILD FAILED. Commit blocked."
+    exit 1
+  fi
+fi
+
+if [ -f "angular.json" ]; then
+  echo "-> Angular project detected, running ng build..."
+  npx ng build --configuration production
+  if [ $? -ne 0 ]; then
+    echo "BUILD FAILED. Commit blocked."
+    exit 1
+  fi
+fi
+
+echo "Build passed. Proceeding with commit."
